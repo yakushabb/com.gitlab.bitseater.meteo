@@ -1,16 +1,21 @@
 {
     "app-id" : "com.gitlab.bitseater.meteo",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "42",
+    "runtime-version" : "46",
     "sdk" : "org.gnome.Sdk",
     "command" : "com.gitlab.bitseater.meteo",
     "cleanup" : [
         "/include",
         "/lib/pkgconfig",
+        "/share/aclocal",
+        "/share/doc",
+        "/share/gettext",
+        "/share/gir-1.0",
+        "/share/man",
         "/share/vala",
         "/man",
-        "*.a",
-        "*.la"
+        "*.la",
+        "*.a"
     ],
     "only-arches": ["x86_64"],
     "finish-args" : [
@@ -25,6 +30,47 @@
     ],
     "modules" : [
         "shared-modules/libappindicator/libappindicator-gtk3-introspection-12.10.json",
+        "shared-modules/libsoup/libsoup-2.4.json",
+        {
+            "name": "unifdef",
+            "no-autogen": true,
+            "make-install-args": [
+                "prefix=${FLATPAK_DEST}"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://dotat.at/prog/unifdef/unifdef-2.12.tar.xz",
+                    "sha256": "43ce0f02ecdcdc723b2475575563ddb192e988c886d368260bc0a63aee3ac400"
+                }
+            ],
+            "cleanup": [
+                "*"
+            ]
+        },
+        {
+            "name": "webkit2gtk-4.0",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DPORT=GTK",
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DENABLE_BUBBLEWRAP_SANDBOX=OFF",
+                "-DENABLE_DOCUMENTATION=OFF",
+                "-DENABLE_GAMEPAD=OFF",
+                "-DENABLE_WEBDRIVER=OFF",
+                "-DUSE_GTK4=OFF",
+                "-DUSE_LIBBACKTRACE=OFF",
+                "-DUSE_JPEGXL=OFF",
+                "-DUSE_SOUP2=ON"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://webkitgtk.org/releases/webkitgtk-2.44.1.tar.xz",
+                    "sha256": "425b1459b0f04d0600c78d1abb5e7edfa3c060a420f8b231e9a6a2d5d29c5561"
+                }
+            ]
+        },
         {
             "name" : "weather",
             "buildsystem" : "meson",
@@ -36,6 +82,10 @@
                     "type" : "archive",
                     "url" : "https://gitlab.com/bitseater/meteo/-/archive/0.9.9.3/meteo-0.9.9.3.tar.gz",
                     "sha256" : "fa8bca52c3c5914cb362296bb2e3d4337ef5251f1340cf1093f2d713c378c293"
+                },
+                {
+                    "type" : "patch",
+                    "path" : "fix_appdata.patch"
                 }
             ]
         }
